@@ -107,11 +107,15 @@ class Value:
         return out
 
     def relu(self):
+        # ReLU（Rectified Linear Unit，修正线性单元）：激活函数，为网络引入非线性
+        # 没有非线性，无论叠多少层都等价于一层，网络无法拟合复杂模式
+        # 公式：ReLU(x) = x if x > 0 else 0
+        #   正数原样通过，负数直接归零，像一个"开关"
         out = Value(0 if self.data < 0 else self.data, (self,), 'ReLU')  # forward：ReLU(x) = max(0, x)
 
         def _backward():
-            # ReLU 导数：x > 0 时为 1，x <= 0 时为 0
-            # (out.data > 0) 返回 Python bool，乘以 out.grad 实现分段导数
+            # ReLU 导数：x > 0 时斜率为 1（直接通过），x <= 0 时斜率为 0（梯度断流）
+            # (out.data > 0) 返回 Python bool（0 或 1），乘以 out.grad 实现这个分段导数
             self.grad += (out.data > 0) * out.grad
         out._backward = _backward
 
