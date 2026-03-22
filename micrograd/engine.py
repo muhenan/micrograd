@@ -10,11 +10,26 @@
 #       # 执行完后 w1.grad = dLoss/dw1，w2.grad = dLoss/dw2
 #       # 梯度的含义：该参数增大一点，loss 会增大还是减小，幅度多大
 #
-# 3. 更新参数：沿梯度反方向，走一小步（学习率 lr 控制步子大小）
+# 3. 更新参数 / Optimization（优化）：沿梯度反方向，走一小步（学习率 lr 控制步子大小）
 #       w1.data -= lr * w1.grad
 #       w2.data -= lr * w2.grad
+#    具体的更新算法叫 Optimizer（优化器），最基础的叫 SGD（Stochastic Gradient Descent，随机梯度下降）
+#    PyTorch 中：
+#       optimizer = torch.optim.SGD(model.parameters(), lr=0.01)
+#       optimizer.step()       # 执行参数更新
+#       optimizer.zero_grad()  # 梯度清零，准备下一轮
 #
 # 反复执行以上三步，loss 越来越小，模型越来越准。
+#
+# PyTorch 封装程度说明：
+#   - loss.backward()：PyTorch 自动完成第 2 步（求导），这正是 micrograd 手动实现的部分
+#   - Loss 函数和 Optimizer：需要自己选，PyTorch 提供了很多现成选项
+#   - 用现成网络结构（Linear、CNN 等）：连第 1 步 forward 计算也封装好了
+#   所以用 PyTorch 训练模型，自己写的核心只有三行：
+#       loss = criterion(y_pred, y_true)  # 选 Loss 函数，算出 loss
+#       loss.backward()                   # 自动求导
+#       optimizer.step()                  # 更新参数
+#
 # Value 类的作用：在 forward 时自动记录计算图，使得 backward 可以自动完成第 2 步。
 
 # ─────────────────────────────────────────────────────────────────────────────
